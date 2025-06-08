@@ -1,3 +1,4 @@
+USE store;
 CREATE TABLE addresses
 (
     id      BIGINT AUTO_INCREMENT NOT NULL,

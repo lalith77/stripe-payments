@@ -2,8 +2,15 @@ spring:
   application:
     name: store
   datasource:
-    url: jdbc:mysql://localhost:3306/store_api?createDatabaseIfNotExist=true
+    url: jdbc:mysql://localhost:3306/store?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
     username: root
-    password: MyPassword!
+    password: rootpassword
+    driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
+    hibernate:
+      ddl-auto: validate
     show-sql: true
+  flyway:
+    schemas: store
+    default-schema: store  # Explicitly sets the default schema for Flyway
+    create-schemas: true

@@ -6,19 +6,18 @@ import com.demo.store.entities.User;
 import com.demo.store.repositories.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @AllArgsConstructor
+@RequestMapping("/users")
 public class UserController {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-    @GetMapping("/user/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<User> findUserById(@PathVariable Long id) {
         User user = userRepository.findById(id).orElse(null);
         if (user == null) {
@@ -27,11 +26,17 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    @GetMapping("/users")
+    @GetMapping
     public List<UserDto> getAllUsers() {
         List<User> users = userRepository.findAll();
         return users.stream()
                 .map(userMapper::toDto).toList();
+    }
+
+    @PostMapping
+    public UserDto createUser(@RequestBody UserDto data){
+        //only returning the data for now
+        return data;
     }
 
 

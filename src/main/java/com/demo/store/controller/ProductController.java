@@ -5,7 +5,9 @@ import com.demo.store.Mappers.ProductMapper;
 import com.demo.store.entities.Product;
 import com.demo.store.repositories.ProductRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,16 +21,24 @@ public class ProductController {
     private final ProductMapper productMapper;
 
     @GetMapping("/products")
-    public List<ProductDto> getAllProducts(@RequestParam(required = false) Long categoryId){
+    public ResponseEntity<List<ProductDto>> getAllProducts(
+            @RequestParam(required = false) Long categoryId,
+            @RequestHeader(name = "x-auth-token", required = false) String authToken) {
+        // sample token
+        System.out.println(authToken);
         List<Product> productList = new ArrayList<>();
-        if(categoryId != null){
+        if (categoryId != null) {
             productList = productRepository.findByCategoryId(categoryId);
+        } else {
+            productList = productRepository.findAllWithCategory();
         }
-        else{
-            productList =productRepository.findAll();
+        if (productList.isEmpty()) {
+            return ResponseEntity.notFound().build();
         }
-        return productList.stream()
+        List<ProductDto> productDtoList = productList.stream()
                 .map(productMapper::toDto).toList();
-
+        return ResponseEntity.ok(productDtoList);
     }
+
+
 }

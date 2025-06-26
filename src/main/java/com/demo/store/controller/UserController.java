@@ -2,6 +2,7 @@ package com.demo.store.controller;
 
 import com.demo.store.DTOs.UserDto;
 import com.demo.store.DTOs.UserRegisterRequest;
+import com.demo.store.DTOs.UserUpdateRequest;
 import com.demo.store.Mappers.UserMapper;
 import com.demo.store.entities.User;
 import com.demo.store.repositories.UserRepository;
@@ -49,6 +50,16 @@ public class UserController {
         return ResponseEntity.created(uri).body(userDto);
     }
 
-
+    @PatchMapping("/{id}")
+    public ResponseEntity<UserDto> updateUser(@PathVariable Long id,
+                                              @RequestBody UserUpdateRequest userUpdateRequest) {
+        User user = userRepository.findById(id).orElse(null);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+        userMapper.toUser(userUpdateRequest, user);
+        userRepository.save(user);
+        return ResponseEntity.ok(userMapper.toDto(user));
+    }
 }
 

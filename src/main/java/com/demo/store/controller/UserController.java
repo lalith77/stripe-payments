@@ -1,13 +1,17 @@
 package com.demo.store.controller;
 
 import com.demo.store.DTOs.UserDto;
+import com.demo.store.DTOs.UserRegisterRequest;
 import com.demo.store.Mappers.UserMapper;
 import com.demo.store.entities.User;
 import com.demo.store.repositories.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -34,9 +38,15 @@ public class UserController {
     }
 
     @PostMapping
-    public UserDto createUser(@RequestBody UserDto data){
-        //only returning the data for now
-        return data;
+    public ResponseEntity<UserDto> createUser(@RequestBody UserRegisterRequest userRegisterRequest,
+                                              UriComponentsBuilder uriComponentsBuilder) {
+        User user = userMapper.toEntity(userRegisterRequest);
+        System.out.println(user);
+        userRepository.save(user);
+
+        UserDto userDto = userMapper.toDto(user);
+        URI uri = uriComponentsBuilder.path("/users/{id}").buildAndExpand(userDto.getId()).toUri();
+        return ResponseEntity.created(uri).body(userDto);
     }
 
 

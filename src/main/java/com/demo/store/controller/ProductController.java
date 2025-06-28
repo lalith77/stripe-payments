@@ -1,12 +1,9 @@
 package com.demo.store.controller;
 
 import com.demo.store.DTOs.ProductDto;
-import com.demo.store.DTOs.UserDto;
-import com.demo.store.DTOs.UserUpdateRequest;
 import com.demo.store.Mappers.ProductMapper;
 import com.demo.store.entities.Category;
 import com.demo.store.entities.Product;
-import com.demo.store.entities.User;
 import com.demo.store.repositories.CategoryRepository;
 import com.demo.store.repositories.ProductRepository;
 import lombok.AllArgsConstructor;
@@ -50,6 +47,9 @@ public class ProductController {
     public ResponseEntity<ProductDto> createProduct(@RequestBody ProductDto productDto,
                                                     UriComponentsBuilder uriComponentsBuilder) {
         Product product = productMapper.toProductEntity(productDto);
+        Category category = categoryRepository.findById(productDto.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+        product.setCategory(category);
         productRepository.save(product);
 
         productDto.setId(product.getId());
@@ -66,9 +66,7 @@ public class ProductController {
             return ResponseEntity.notFound().build();
         }
         //get new product data
-        product = productMapper.toProductEntity(productDto);
-//        Category category = new Category();
-//        category.setId(productDto.getCategoryId());
+        productMapper.updateToProduct(productDto,product);
 
         Category category = categoryRepository.findById(productDto.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Category not found"));

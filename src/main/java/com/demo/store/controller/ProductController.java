@@ -4,6 +4,7 @@ import com.demo.store.DTOs.ProductDto;
 import com.demo.store.Mappers.ProductMapper;
 import com.demo.store.entities.Category;
 import com.demo.store.entities.Product;
+import com.demo.store.entities.User;
 import com.demo.store.repositories.CategoryRepository;
 import com.demo.store.repositories.ProductRepository;
 import lombok.AllArgsConstructor;
@@ -60,13 +61,13 @@ public class ProductController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<ProductDto> updateUser(@PathVariable Long id,
-                                              @RequestBody ProductDto productDto) {
+                                                 @RequestBody ProductDto productDto) {
         Product product = productRepository.findById(id).orElse(null);
         if (product == null) {
             return ResponseEntity.notFound().build();
         }
         //get new product data
-        productMapper.updateToProduct(productDto,product);
+        productMapper.updateToProduct(productDto, product);
 
         Category category = categoryRepository.findById(productDto.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Category not found"));
@@ -75,5 +76,15 @@ public class ProductController {
         return ResponseEntity.ok(productMapper.toDto(product));
     }
 
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+        Product product = productRepository.findById(id).orElse(null);
+        if (product == null) {
+            return ResponseEntity.notFound().build();
+        }
+        productRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
 
 }

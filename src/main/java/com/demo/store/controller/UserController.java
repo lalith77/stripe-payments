@@ -16,6 +16,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @AllArgsConstructor
@@ -41,8 +42,12 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserRegisterRequest userRegisterRequest,
-                                              UriComponentsBuilder uriComponentsBuilder) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody UserRegisterRequest userRegisterRequest,
+                                          UriComponentsBuilder uriComponentsBuilder) {
+        if (userRepository.existsByEmail(userRegisterRequest.getEmail())) {
+            return ResponseEntity.badRequest().body(Map.of("email", "Email is already registered"));
+        }
+
         User user = userMapper.toEntity(userRegisterRequest);
         System.out.println(user);
         userRepository.save(user);

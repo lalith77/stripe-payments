@@ -66,4 +66,13 @@ public class CartController {
         CartItemDto cartItemDto = cartMapper.toDto(cartItem);
         return ResponseEntity.status(HttpStatus.CREATED).body(cartItemDto);
     }
+
+    @GetMapping("/{cartId}")
+    public ResponseEntity<CartDto> getCart(@PathVariable UUID cartId) {
+        Cart cart = cartRepository.findById(cartId).orElse(null);
+        if (cart == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(cartMapper.toDto(cart));
+    }
 }

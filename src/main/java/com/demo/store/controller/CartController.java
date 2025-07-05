@@ -3,16 +3,19 @@ package com.demo.store.controller;
 import com.demo.store.DTOs.AddItemToCartRequest;
 import com.demo.store.DTOs.CartDto;
 import com.demo.store.DTOs.CartItemDto;
+import com.demo.store.DTOs.UpdateCartItemRequest;
 import com.demo.store.Mappers.CartMapper;
 import com.demo.store.entities.Cart;
 import com.demo.store.entities.CartItem;
 import com.demo.store.entities.CartRepository;
 import com.demo.store.repositories.ProductRepository;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -74,5 +77,34 @@ public class CartController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(cartMapper.toDto(cart));
+    }
+
+    @PutMapping("/{cartId}/items/{productId}")
+    public ResponseEntity<?> updateCartItem(
+            @PathVariable UUID cartId,
+            @PathVariable Long productId,
+            @Valid @RequestBody UpdateCartItemRequest updateCartItemRequest) {
+        Cart cart = cartRepository.findById(cartId).orElse(null);
+        if (cart == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    Map.of("error", "cart not found")
+            );
+        }
+
+        // check if the product exists as a cartItem in the cart
+        CartItem cartItem = cart.getCartItems().stream()
+                .filter(item -> item.getProduct().getId().equals(productId))
+                .findFirst()
+                .orElse(null);
+
+        if (cartItem == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    Map.of("error", "product not found in cart")
+            );
+        }
+
+        cartItem.setQuantity(updateCartItemRequest.getQuantity());
+        cartRepository.save(cart);
+        return ResponseEntity.ok(cartMapper.toDto(cartItem));
     }
 }

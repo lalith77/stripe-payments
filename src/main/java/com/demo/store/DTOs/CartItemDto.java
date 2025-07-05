@@ -1,11 +1,12 @@
 package com.demo.store.DTOs;
 
-import lombok.Value;
+import lombok.Data;
+import java.math.BigDecimal;
 
-import java.io.Serializable;
 
-
-@Value
-public class CartItemDto implements Serializable {
-    Long id;
+@Data
+public class CartItemDto {
+    private CartItemProductDto product;
+    private int quantity;
+    private BigDecimal totalPrice;
 }

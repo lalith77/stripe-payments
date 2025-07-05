@@ -49,22 +49,7 @@ public class CartController {
             return ResponseEntity.badRequest().build();
         }
 
-        // if product already exists in cart, we need to increment quantity
-        CartItem cartItem = cart.getCartItems().stream()
-                .filter(item -> item.getProduct().getId().equals(product.getId()))
-                .findFirst()
-                .orElse(null);
-
-        if (cartItem != null) {
-            cartItem.setQuantity(cartItem.getQuantity() + 1);
-        } else {
-            cartItem = new CartItem();
-            cartItem.setQuantity(1);
-            cartItem.setProduct(product);
-            cartItem.setCart(cart);
-            cart.getCartItems().add(cartItem);
-        }
-
+        CartItem cartItem= cart.addCartItem(product);
         cartRepository.save(cart);
         CartItemDto cartItemDto = cartMapper.toDto(cartItem);
         return ResponseEntity.status(HttpStatus.CREATED).body(cartItemDto);
@@ -92,10 +77,7 @@ public class CartController {
         }
 
         // check if the product exists as a cartItem in the cart
-        CartItem cartItem = cart.getCartItems().stream()
-                .filter(item -> item.getProduct().getId().equals(productId))
-                .findFirst()
-                .orElse(null);
+        CartItem cartItem = cart.getCartItem(productId);
 
         if (cartItem == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(

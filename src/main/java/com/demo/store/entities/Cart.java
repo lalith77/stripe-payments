@@ -26,9 +26,33 @@ public class Cart {
     @OneToMany(mappedBy = "cart", cascade = CascadeType.MERGE)
     private Set<CartItem> cartItems = new LinkedHashSet<>();
 
-    public BigDecimal getTotalPrice(){
+    public BigDecimal getTotalPrice() {
         return cartItems.stream()
                 .map(CartItem::getTotalPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
+
+    public CartItem getCartItem(Long productId) {
+        return cartItems.stream()
+                .filter(item -> item.getProduct().getId().equals(productId))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public CartItem addCartItem(Product product) {
+        // if product already exists in cart, we need to increment quantity
+        CartItem cartItem = getCartItem(product.getId());
+
+        if (cartItem != null) {
+            cartItem.setQuantity(cartItem.getQuantity() + 1);
+        } else {
+            cartItem = new CartItem();
+            cartItem.setQuantity(1);
+            cartItem.setProduct(product);
+            cartItem.setCart(this);
+            getCartItems().add(cartItem);
+        }
+        return cartItem;
+    }
+
 }

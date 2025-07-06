@@ -49,7 +49,7 @@ public class CartController {
             return ResponseEntity.badRequest().build();
         }
 
-        CartItem cartItem= cart.addCartItem(product);
+        CartItem cartItem = cart.addCartItem(product);
         cartRepository.save(cart);
         CartItemDto cartItemDto = cartMapper.toDto(cartItem);
         return ResponseEntity.status(HttpStatus.CREATED).body(cartItemDto);
@@ -88,5 +88,19 @@ public class CartController {
         cartItem.setQuantity(updateCartItemRequest.getQuantity());
         cartRepository.save(cart);
         return ResponseEntity.ok(cartMapper.toDto(cartItem));
+    }
+
+    @DeleteMapping("/{cartId}/items/{productId}")
+    public ResponseEntity<Map<String, String>> deleteCartItem(@PathVariable Long productId, @PathVariable UUID cartId) {
+        Cart cart = cartRepository.findById(cartId).orElse(null);
+        if (cart == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    Map.of("error", "cart not found")
+            );
+        }
+
+        cart.removeCartItem(productId);
+        cartRepository.save(cart);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -10,6 +10,8 @@ spring:
     hibernate:
       ddl-auto: validate
     show-sql: true
+  jwt:
+    secret: ${JWT_SECRET}
   flyway:
     schemas: store
     default-schema: store  # Explicitly sets the default schema for Flyway

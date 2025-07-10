@@ -28,8 +28,14 @@ public class AuthController {
                         loginRequest.getPassword()
                 )
         );
-        String token= jwtService.generateToken(loginRequest.getEmail());
+        String token = jwtService.generateToken(loginRequest.getEmail());
         return ResponseEntity.ok(new JwtResponse(token));
+    }
+
+    @PostMapping("/validate")
+    public boolean validate(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        return jwtService.validateToken(token);
     }
 
     @ExceptionHandler(BadCredentialsException.class)

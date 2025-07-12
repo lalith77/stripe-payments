@@ -27,14 +27,23 @@ public class JwtService {
     public boolean validateToken(String token) {
         Claims claims;
         try {
-            claims = Jwts.parser()
-                    .verifyWith(Keys.hmacShaKeyFor(secret.getBytes()))
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload();
+            claims = getClaims(token);
         } catch (JwtException e) {
             return false;
         }
         return claims.getExpiration().after(new Date());   //checks if expiration is after current date
+    }
+
+    private Claims getClaims(String token) {
+        return Jwts.parser()
+                .verifyWith(Keys.hmacShaKeyFor(secret.getBytes()))
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+    }
+
+    public String getEmailFromToken(String token) {
+        Claims claims = getClaims(token);
+        return claims.getSubject();
     }
 }

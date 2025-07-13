@@ -12,6 +12,8 @@ spring:
     show-sql: true
   jwt:
     secret: ${JWT_SECRET}
+    accessTokenExpiration: 100
+    refreshTokenExpiration: 604800
   flyway:
     schemas: store
     default-schema: store  # Explicitly sets the default schema for Flyway

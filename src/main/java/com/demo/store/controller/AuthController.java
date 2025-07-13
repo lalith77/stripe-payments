@@ -4,6 +4,7 @@ import com.demo.store.DTOs.JwtResponse;
 import com.demo.store.DTOs.LoginRequest;
 import com.demo.store.DTOs.UserDto;
 import com.demo.store.Mappers.UserMapper;
+import com.demo.store.config.JwtConfig;
 import com.demo.store.repositories.UserRepository;
 import com.demo.store.service.JwtService;
 import jakarta.servlet.http.Cookie;
@@ -26,6 +27,7 @@ public class AuthController {
     private final JwtService jwtService;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final JwtConfig jwtConfig;
 
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> login(@RequestBody @Valid LoginRequest loginRequest, HttpServletResponse response) {
@@ -43,7 +45,7 @@ public class AuthController {
         var cookie = new Cookie("refreshToken", refreshToken);
         cookie.setHttpOnly(true);
         cookie.setPath("/auth/refresh");
-        cookie.setMaxAge(604800);
+        cookie.setMaxAge(jwtConfig.getRefreshTokenExpiration());
         cookie.setSecure(true);
         response.addCookie(cookie);
         return ResponseEntity.ok(new JwtResponse(accessToken));

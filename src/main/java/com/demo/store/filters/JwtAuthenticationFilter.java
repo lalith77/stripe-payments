@@ -7,7 +7,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -29,7 +28,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (jwtService.validateToken(token)) {
                 // at this point the token is valid, so we want to save an authentication object in the security context
                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                        jwtService.getEmailFromToken(token),  // principal
+                        jwtService.getUserIdFromToken(token),  // principal
                         null,  // credentials, not needed here
                         null   // authorities, not needed here
                 );

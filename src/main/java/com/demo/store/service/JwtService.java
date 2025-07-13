@@ -1,5 +1,6 @@
 package com.demo.store.service;
 
+import com.demo.store.entities.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -14,10 +15,12 @@ public class JwtService {
     @Value("${spring.jwt.secret}")
     private String secret;
 
-    public String generateToken(String email) {
+    public String generateToken(User user) {
         final long tokenExpiration = 86400;  // seconds in a day
         return Jwts.builder()
-                .subject(email)
+                .subject(user.getId().toString())
+                .claim("email", user.getEmail())
+                .claim("name", user.getName())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + 1000 * tokenExpiration))
                 .signWith(Keys.hmacShaKeyFor(secret.getBytes()))
@@ -42,8 +45,8 @@ public class JwtService {
                 .getPayload();
     }
 
-    public String getEmailFromToken(String token) {
+    public Long getUserIdFromToken(String token) {
         Claims claims = getClaims(token);
-        return claims.getSubject();
+        return Long.valueOf(claims.getSubject());
     }
 }

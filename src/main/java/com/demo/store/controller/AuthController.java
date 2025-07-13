@@ -9,7 +9,6 @@ import com.demo.store.service.JwtService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -34,7 +33,10 @@ public class AuthController {
                         loginRequest.getPassword()
                 )
         );
-        String token = jwtService.generateToken(loginRequest.getEmail());
+
+        var user= userRepository.findByEmail(loginRequest.getEmail())
+                .orElseThrow(() -> new BadCredentialsException("Invalid email or password"));
+        String token = jwtService.generateToken(user);
         return ResponseEntity.ok(new JwtResponse(token));
     }
 
@@ -51,8 +53,8 @@ public class AuthController {
             // security context is empty, user is not authenticated
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        String email = auth.getPrincipal().toString();
-        var user = userRepository.findByEmail(email).orElse(null);
+        var userId = (Long) auth.getPrincipal();
+        var user = userRepository.findById(userId).orElse(null);
         if (user == null) {
             // user not found
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

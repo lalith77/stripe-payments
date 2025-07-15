@@ -5,6 +5,7 @@ import com.demo.store.DTOs.UserDto;
 import com.demo.store.DTOs.UserRegisterRequest;
 import com.demo.store.DTOs.UserUpdateRequest;
 import com.demo.store.Mappers.UserMapper;
+import com.demo.store.entities.Role;
 import com.demo.store.entities.User;
 import com.demo.store.repositories.UserRepository;
 import jakarta.validation.Valid;
@@ -52,6 +53,7 @@ public class UserController {
 
         User user = userMapper.toEntity(userRegisterRequest);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRole(Role.USER); // Default role for new users
         userRepository.save(user);
 
         UserDto userDto = userMapper.toDto(user);

@@ -12,7 +12,7 @@ spring:
     show-sql: true
   jwt:
     secret: ${JWT_SECRET}
-    accessTokenExpiration: 100
+    accessTokenExpiration: 1000
     refreshTokenExpiration: 604800
   flyway:
     schemas: store
